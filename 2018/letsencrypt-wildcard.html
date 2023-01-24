@@ -1,0 +1,53 @@
+<p>Let's Encrypt でワイルドカード証明書を取得してみたら驚くほど簡単だったので、記事として残しておきます。</p>
+
+<h2>ワイルドカード証明書とは</h2>
+
+<p>ワイルドカード証明書とは、サブドメイン全てに一致する証明書です。例えば <code>*.example.com</code> で取得した証明書は、<code>sub1.example.com</code> や <code>sub2.example.com</code> に一致します 。</p>
+
+<p>ワイルドカード証明書を使用することで、サブドメイン全てに個別の証明書を発行する手間が省けるため、管理がぐっと楽になります。</p>
+
+<h2>手順</h2>
+
+<p>今回は Dry Run を使用して、証明書の発行ができることを確認するだけにします。</p>
+
+<p>ワイルドカード証明書を発行するには、DNS を使用してドメインを検証する必要があります。</p>
+
+<pre><code>sudo certbot certonly --dry-run <b>--manual --preferred-challenges dns-01</b>
+</code></pre>
+
+<p>次に、発行先のドメインを聞かれます。<br>
+<code>*.example.com</code> のように入力するだけで、自動的にワイルドカード証明書として発行してくれます。便利ですね。</p>
+
+<pre><code>Please enter in your domain name(s) (comma and/or space separated)  (Enter 'c' to cancel):
+*.example.com
+</code></pre>
+
+<p>最後にドメインの検証です。表示される案内に従って、DNS に TXT レコードを設定してください。</p>
+
+<pre><code>Please deploy a DNS TXT record under the name
+_acme-challenge.example.com with the following value:
+
+ランダムな文字列
+
+Before continuing, verify the record is deployed.
+Press Enter to Continue
+</code></pre>
+
+<p>DNS を設定したら、エンターキーを押すと証明書が発行されます。</p>
+
+<h2>注意事項・ハマったところ</h2>
+
+<h3>サブドメインにしか適用されない</h3>
+
+<p>先程は <code>*.example.com</code> に対して証明書を発行しましたが、この証明書は <code>example.com</code> には使用できません。</p>
+
+<p><code>example.com</code> にも対応する証明書を作成するには、次のようにします。</p>
+
+<pre><code>Please enter in your domain name(s) (comma and/or space separated)  (Enter 'c' to cancel):
+<b>*.example.com example.com</b></code></pre>
+
+<h3>証明書の自動更新がめんどい</h3>
+
+<p>ワイルドカード証明書を発行するときに <code>--manual</code> を指定する必要がありましたが、この影響でいつもどおり <code>sudo certbot renew</code> しても怒られてしまいます。シェルスクリプトを作成して、引数に渡す必要があるみたいです。</p>
+
+<p>デフォルトの certbot の設定では自動更新がなされないので、注意が必要です。</p>

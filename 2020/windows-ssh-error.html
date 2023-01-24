@@ -1,0 +1,9 @@
+<h2>対処法</h2>
+<p>ssh-agent を有効にして、ssh-add する。</p>
+<pre><code>Set-Service -Name ssh-agent -StartupType Manual
+Start-Service ssh-agent
+
+ssh-add ~/.ssh/id_rsa</code></pre>
+
+<h2>参考</h2>
+<p><a href='https://qiita.com/yuta0801/items/d65f1fc3115773861283'>Win10でssh-addがError connecting to agent: No such file or directory - Qiita</a></p>

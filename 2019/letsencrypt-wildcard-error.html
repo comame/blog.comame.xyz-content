@@ -1,0 +1,7 @@
+<h2>発生する問題</h2>
+<p>Certbot でワイルドカード証明書を発行しようとしたときに<code>The currently selected ACME CA endpoint does not support issuing wildcard certificates</code>というお叱りを受ける。</p>
+
+<h2>解決方法</h2>
+<p>ACME v2 のエンドポイントを直接指定してやれば良い。
+<pre><code>$ certbot certonly --server https://acme-v02.api.letsencrypt.org/directory</code></pre>
+<p>Let's Encrypt のエンドポイントは<a href='https://letsencrypt.org/ja/docs/acme-protocol-updates/'>このドキュメント</a>に記載されている。</p>

@@ -1,0 +1,176 @@
+<p><a href='https://adventar.org/calendars/4197'>Google Blogger Advent Calendar 2019</a> の 10 日目の記事です。</p>
+
+<p>Blogger には、標準でおしゃれなテーマがいくつか付属しています。また、検索エンジンで少し調べてみれば、有志が作成した素晴らしいテーマを簡単に見つけることができます。しかし、こうは思ったことはありませんか？「自分だけのテーマを作ってみたい」と。</p>
+<p>この記事では、Blogger のテーマを作成するためのチュートリアルと TIPS をお届けします。</p>
+
+<h2>前置き</h2>
+<p>HTML や CSS などの基本的な Web 技術が多少分かることを前提としています。また、SEO を目的としたテーマ作成について扱うわけではありません。</p>
+
+<h2>まずはじめに</h2>
+<h3>Blogger のテーマってどこで作るの？</h3>
+<p><a href='https://blogger.com'>Blogger</a> を開き、「テーマ」を開きます。「HTML を編集」のボタンをクリックすると、エディタが開きます。あとは自分の HTML を書いていくだけです。(このエディタは結構使いにくいので、手元で書いたものを貼り付ける方が良いかもしれません。テキストエディタは VSCode や Atom, Sublime Text などが有名です)</p>
+
+<h3>Blogger のテンプレートを記述する XML って何？</h3>
+<p>Blogger のテーマは HTML とは少し形式の異なる、XML という言語で記述します。大まかな違いとしては、HTML は多少誤った記述をしても寛大に解釈されます (例えば、閉じタグを忘れても自動的に閉じてくれます)。一方で、XML は文法に則った記述をしないと、エラーとなってしまいます。具体的な違いとしては、まず XML では閉じタグを省略できません。<code>&lt;img&gt;</code>などの閉じタグが不要なタグでも、必ず記述しなければなりません。
+<pre><code>閉じタグを忘れるとエラーになる
+ng -- &lt;h1&gt;&lt;h2&gt;Heading&lt;/h1&gt;
+
+閉じタグを省略できない
+ok -- &lt;img src='https://example.com/foo.png'&gt;&lt;/img&gt;
+ok -- &lt;img src='https://example.com/foo.png'/&gt;
+ng -- &lt;img src='https://example.com/foo.png'&gt;</code></pre>
+
+<p>また、ファイルの先頭に決められた形式の記述をしなければなりません。Blogger の場合は次のようになります。</p>
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+
+&lt;!DOCTYPE html&gt;
+&lt;html b:responsive='true' lang='ja' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'&gt;
+
+&lt;!-- Your cool things here --&gt;</code></pre></p>
+
+<h2>テーマの構成</h2>
+<p>Blogger のテーマには、決められた構成が存在します。これは皆さんが Blogger 管理画面の「レイアウト」で見慣れているものとほぼ同じです。Blogger のテーマで使用されるレイアウトのパーツには、b:section, b:widget, b:includable (b:include) があります。</p>
+
+<p>Blogger のレイアウト構成は次のようになっています。<img alt='Blogger のレイアウト構成図' src="https://1.bp.blogspot.com/-Xtu3MKf6JhI/Xek_htDkw3I/AAAAAAABIcc/M-Wig09D2c0Pn3QEGAf80aSy6I24fhfWQCLcBGAsYHQ/s1600/%25E7%2584%25A1%25E9%25A1%258C%25E3%2581%25AE%25E5%259B%25B3%25E5%25BD%25A2%25E6%258F%258F%25E7%2594%25BB.png" /></p>
+
+<h3>b:section</h3>
+<p>レイアウトの最上位に配置されます。日本語の管理画面では「セクション」と表示されていますね。セクションにはウィジェットだけを含むことができます。
+<code>id</code>属性は必須です。他の ID と重複しない一意な文字列を指定します。
+<pre><code>&lt;b:section id='foo'&gt;
+  &lt;!-- widgets --&gt;
+&lt;/b:section&gt;</code></pre>
+</p>
+
+<h3>b:widget</h3>
+<p>セクションの中に配置されます。管理画面では「ウィジェット」と表示されています。皆さんが Blogger をカスタマイズするときには、最も良く扱う部分ではないでしょうか。ウィジェットの特徴としては、 Blogger によって用意されているものだけを使用できるという点が挙げられます。また、ウィジェット内には後述する <code>b:includable</code>のみを配置できます。</p>
+<p><code>id</code>と<code>type</code>属性は必須です。<code>type</code>属性には BlogArchive, Blog, Header, LinkList, NavBar, BlogProfile などを指定できます。これらは管理画面から追加できるウィジェットと同じです。また、<code>id</code>属性は Type + 連番の形式にする必要があります。
+<pre><code>&lt;b:section id='foo'&gt;
+
+  &lt;b:widget id='Blog1' type='Blog'&gt;
+    &lt;-- includables --&gt;
+  &lt;/b:widget&gt;
+
+  &lt;b:widget id='LinkList1' type='LinkList'&gt;
+    &lt;-- includables --&gt;
+  &lt;/b:widget&gt;
+
+&lt;/b:section&gt;</code></pre></p>
+
+<h3>b:includable</h3>
+<p>ウィジェットの中で使用されるパーツです。includable という名前が表すように、他の場所で再利用可能です。セクションやウィジェットと異なり、この中では自由に要素を追加できます。</p>
+<p><code>id</code>属性は必須です。また、各ウィジェット内には必ず<code>main</code>を ID とした includable が必要です。<code>main</code>以外を指定した includable は、<code>b:include</code>で明示的に指定しない限り、表示されません。
+<pre><code>&lt;b:section id='foo'&gt;
+  &lt;b:widget id='Blog1' type='Blog'&gt;
+
+    &lt;b:includable id='main'&gt;
+      &lt;p&gt;やっと他の要素を書き込める！&lt;/p&gt;
+    &lt;/b:includable&gt;
+
+    &lt;b:includable id='another-includable'&gt;
+      &lt;p&gt;まだ表示されない&lt;/p&gt;
+    &lt;/b:includable&gt;
+
+  &lt;/b:widget&gt;
+&lt;/b:section&gt;</code></pre>
+</p>
+
+<h3>b:include</h3>
+<p>includable を再利用します。<code>name</code>属性を使用して include するものを指定します。
+
+<pre><code>&lt;b:section id='foo'&gt;
+  &lt;b:widget id='Blog1' type='Blog'&gt;
+
+    &lt;b:includable id='main'&gt;
+      &lt;p&gt;やっと他の要素を書き込める！&lt;/p&gt;
+      &lt;b:include name='another-includable'&gt;&lt;/b:includable&gt;
+    &lt;/b:includable&gt;
+
+    &lt;b:includable id='another-includable'&gt;
+      &lt;p&gt;main の中に表示された！&lt;/p&gt;
+    &lt;/b:includable&gt;
+
+  &lt;/b:widget&gt;
+&lt;/b:section&gt;</code></pre>
+</p>
+
+<h2>データタグ / 制御タグ</h2>
+
+<p>ここまでは、Blogger のレイアウトを構成するタグを説明しました。実際にブログとして機能させるには、ブログのデータを埋め込んでいく必要があります。そこで使用するのがウィジェットタグです。ウィジェットタグは大まかに分類してデータタグと制御タグに分けることができます。</p>
+
+<p>データタグは、ブログのデータを表現します。例えば、<code>&lt;data:blog.title/&gt;</code>というタグは、ブログのタイトルに置き換えられます。使用可能なデータタグは<a href='https://support.google.com/blogger/answer/47270'>ヘルプページ</a>に説明がありますが、いくつか補足があります。「グローバルに利用可能なデータ」は、テーマ内の任意の場所で使用可能です。セクションの外であっても、例えば<code>&lt;title&gt;</code>タグなどに使用できます。一方で、それ以外のデータタグは特定のウィジェット内でしか使用できません。例えば「ブログの投稿」で説明されているデータタグは、<code>&lt;b:widget id='Blog1' type='Blog'&gt;&lt;b:widget&gt;</code>内でのみ使用できます。</p>
+
+<p>制御タグを用いて、ループ (繰り返し) や条件分岐を記述できます。大抵の場合、ブログのトップページに表示する記事の一覧はループを用いることになるでしょう。また、特定の条件でのみ表示させたいタグがあるとき、条件分岐を使います。これは、例えば Blogger 内での記事検索を実装するのに使えるでしょう。条件分岐には b:if, b:elseif, b:else タグを、ループには b:loop タグを使います。
+<pre><code>&lt;!-- &lt;/b:loop&gt; までを、記事の数だけ繰り返す --&gt;
+&lt;b:loop var='post' values='data:posts'&gt;
+
+  &lt;b:if cond='data:blog.pageType == "index"'&gt;
+    &lt;!-- トップページや検索結果画面などで表示される --&gt;
+    &lt;h2&gt;&lt;data:post.title/&gt;&lt;/h2&gt;
+
+    &lt;!-- それ以外で表示される --&gt;
+    &lt;b:else/&gt;
+    &lt;h1&gt;&lt;data:post.title/&gt;&lt;/h1&gt;
+    &lt;p&gt;&lt;data:post.body/&gt;&lt;/p&gt;
+  &lt;/b:if&gt;
+
+&lt;/b:loop&gt;</code></pre></p>
+
+<p><code>b:eval</code>タグと<code>expr:</code>属性 (<a href='https://developer.mozilla.org/ja/docs/Learn/Getting_started_with_the_web/HTML_basics#Anatomy_of_an_HTML_element'>Attribute</a>) は特殊で難しい構文です。<code>eval:</code>属性は、HTML の属性にブログのデータを埋め込みたいときに使用します。例えば、ブログのホームページへのリンクは次のようなものになるでしょう。
+<pre><code>&lt;a expr:href="data:homepageUrl"&gt;ホームページ&lt;/a&gt;</code></pre>
+<p><code>b:eval</code>タグも同様の役割を持ちますが、これは属性ではなくタグです。</p>
+
+<p>制御タグと<code>b:eval</code>、<code>expr:</code>についての<a href='https://support.google.com/blogger/answer/46995'>ヘルプページはこちら</a>です。</p>
+
+<h2>TIPS</h2>
+<h3>SNS などへの共有時にプレビューを表示する</h3>
+<p>SNS に記事を共有したときにプレビューを表示させるには、OGP (Open Graph Protocol, <a href='https://ogp.me'>ogp.me</a>) を使用します。
+<pre><code>&lt;html prefix='og: http://ogp.me/ns#'&gt;
+  &lt;head&gt;
+    &lt;meta property='og:title' content='記事のタイトル'&gt;
+    &lt;meta property='og:type' content='article (トップページなら website)'&gt;
+    &lt;meta property='og:site_name' content='サイト名'&gt;
+    &lt;meta property='og:url' content='記事の URL'&gt;
+    &lt;meta property='og:image' content='記事のサムネイル画像の URL&gt;
+    &lt;meta property='og:description' content='記事の概要'&gt;
+    &lt;meta property='og:locale' content='ja_JP'&gt;</code></pre>
+</p>
+
+<h3>読み込みを高速化する</h3>
+
+<p>Blogger のテーマは、そのまま書くと勝手に CSS や JavaScript を挿入されてしまいます。これらは<a href='https://blog.comame.xyz/2019/04/web-performance.html'>レンダリングをブロックする要因</a>になり、読み込みの低速化に繋がります。もしパフォーマンスにこだわりのある方は、次のような一手間を加えてみてください。
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+
+&lt;!DOCTYPE html&gt;
+&lt;html b:responsive=&#039;true&#039; lang=&#039;ja&#039; xmlns=&#039;http://www.w3.org/1999/xhtml&#039; xmlns:b=&#039;http://www.google.com/2005/gml/b&#039; xmlns:data=&#039;http://www.google.com/2005/gml/data&#039; xmlns:expr=&#039;http://www.google.com/2005/gml/expr&#039;&gt;
+
+  &lt;!-- head 開始タグ--&gt;
+  &amp;lt;!--&lt;head&gt;--&amp;gt;&amp;lt;head&amp;gt;
+    &lt;!-- ... --&gt;
+  &lt;!-- head 終了タグ --&gt;
+  &amp;lt;!--&lt;/head&gt;--&amp;gt;&amp;lt;/head&amp;gt;
+
+  &lt;!-- body 開始タグ (変更する必要なし) --&gt;
+  &lt;body&gt;
+    &lt;!-- ... --&gt;
+  &lt;!-- body 終了タグ --&gt;
+  &amp;lt;!--&lt;/body&gt;--&amp;gt;&amp;lt;/body&amp;gt;
+
+&lt;/html&gt;</code></pre></p>
+<p>ただし、これによって Blogger が用意している CSS が読み込まれなくなるため、公式のウィジェットは正常に機能しなくなる可能性があります。</p>
+
+<h3>凝りすぎない</h3>
+
+<p>自分のブログでしかテーマを使わないのであれば、汎用性にこだわりすぎる必要はありません。例えば、Blogger 公式テーマのように、ヘッダーやフッター、サイドバーなどのパーツに分けて、そこにウィジェットが挿入される可能性を考えて...などやっていると、軽く数日どころではなく日が暮れることになります。例えば Web に公開して誰でも使えるようなものにする、などの目的がないのであれば、「見た目が整えば OK!」という気持ちで挑むのがまずは良いと思います。これが辛いのは、後述するように公式情報が乏しいのも理由だったりするわけですけども...</p>
+<p>例えば、このブログのテーマも1つの変更不可能な巨大ウィジェットだけで構成されています。<img alt='このブログの「レイアウト」画面' src="https://2.bp.blogspot.com/-WPVLWOc-Ua0/Xe2iUHPfxHI/AAAAAAABIfI/DdiyKmiU_b4Wx6WEmnZcpCQBeLeiIibEACLcBGAsYHQ/s1600/%25E3%2582%25B9%25E3%2582%25AF%25E3%2583%25AA%25E3%2583%25BC%25E3%2583%25B3%25E3%2582%25B7%25E3%2583%25A7%25E3%2583%2583%25E3%2583%2588%2B2019-12-09%2B10.24.11.png"/></p>
+
+<h3>公式情報はあまり当てにならない...</h3>
+
+<p>Advent Calendar の<a href='https://outing-diary.blogspot.com/2019/12/blogger.html'>前日の記事</a>にも書かれていたように、テーマ作成について公式に出されている情報は非常に乏しいものになっています。英語のページですが、とてもわかり易く書かれたドキュメントが存在するため、困ったときはそちらも見てみると良いかもしれません (<a href='https://sites.google.com/site/templateofdoom/Home'>https://sites.google.com/site/templateofdoom/</a>)。Google Developers にきちんとリファレンスを出してほしいな...</p>
+
+
+<h2>終わりに</h2>
+<p>参考に、これまでのことをまとめた最小のテンプレートを公開します。<a href='https://gist.github.com/comame/4556f8b06a8b34de688cb7cd454452d7'>GitHub Gist</a></p>
+
+<p>Blogger のテーマを作成するには、ループや条件分岐など、いくらか高度な概念を用いることになります。確かにやや難易度は高いですが、自作のテーマが完成した時は嬉しいですし、何より深い愛着が湧くものです。自分のブログを開くたびに少し嬉しくなるような、そんな素敵なテーマが完成することを祈っています。</p>
+<p>次の記事は minato さんです。楽しい Blogger ライフを！</p>

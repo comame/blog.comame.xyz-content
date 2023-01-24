@@ -1,0 +1,23 @@
+<p>WSL 2 では systemctl が使えないため、システムの起動時に Docker を自動起動することができない。ただ、Windows 側のタスクスケジューラを使えばできるらしい。</p>
+
+<h2>方法</h2>
+<h3>起動用スクリプトを書く</h3>
+<pre><code>#!/usr/bin/env bash
+# このファイルに実行権限も付与しておく
+sudo service docker start</code></pre>
+
+<h3>パスワードなしで実行できるようにする</h3>
+<pre><code>#/etc/sudoers
+user ALL=(ALL:ALL) NOPASSWD: /bin/sh /path/to/script
+</code></pre>
+
+<h3>タスクスケジューラに設定する</h3>
+<ul>
+    <li>全般「最上位の特権で実行する」</li>
+    <li>トリガー「ログイン時」</li>
+    <li>操作「C:\Windows\System32\bash.exe」「-c "sudo /bin/sh /path/to/script"」</li>
+    <li>条件「AC電源に接続されているときのみ」を外す</li>
+</ul>
+
+<h3>参考</h3>
+<p>こちらの Qiita 記事を参考にした。<a href="https://qiita.com/Ningensei848/items/75adeb29bb143633d60c" target="_blank">Automatically Docker Daemon Boot on Windows Subsystem Linux（WSLにおけるdockerデーモンの自動起動）</a></p>

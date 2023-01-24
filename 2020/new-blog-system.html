@@ -1,0 +1,32 @@
+<p>新しいブログシステムを作成して、Blogger から移行した。今は静的ファイルとして静的ファイルサーバから配信している。GitHub でソースコードを公開した。<a href="https://github.com/comame/blog.comame.xyz" target="_blank">comame/blog.comame.xyz</a></p>
+
+<h2>モチベーション</h2>
+<ul>
+    <li>自分が制御可能な形でデータを置きたかった</li>
+    <li>自分の慣れているエディタで HTML を書きたかった</li>
+    <li>Blogger は読み込み速度が少し遅かった</li>
+</ul>
+
+<h2>仕組み</h2>
+
+<h3>記事の管理</h3>
+<p><a target='_blank' href="https://github.com/comame/blog.comame.xyz/tree/master/archives">archives/</a> 配下にすべての記事データを置いている。タイトルやタグ、日付などのメタデータは archives/entries.json に記載する。</p>
+
+<h3>ページの生成</h3>
+<p>JavaScript で archives/entries.json を読み、記事データを展開している。これらは <a target='_blank' href="https://github.com/comame/blog.comame.xyz/blob/master/assets/js/app.js">assets/js/app.js</a> で処理している。History API を使って動的に URL を書き換えているため、Apache や Nginx で URL のリライトが必要。</p>
+
+<h3>静的ビルド</h3>
+<p>ユーザーが閲覧する環境で毎回スクリプトでページを生成するのは筋が悪いため、手元で静的ファイルとしてビルドを行う。ページは JavaScript を使って生成するため、Puppeteer でクロールしてスクリプト実行後の HTML を静的ファイルとして保存している。画像ファイルなどのアセットは、/assets に置いておけば /build/assets にそのままコピーされる。ビルド用のスクリプトは <a target='_blank' href="https://github.com/comame/blog.comame.xyz/blob/master/build.js">build.js</a> である。</p>
+
+<h2>今後の運用</h2>
+<p>VSCode で記事を書き、手元でビルドし、GitHub にアップする。あとはビルド済みの静的ファイルを適当に配信すればよい。今回は GitHub Pages で公開することにした。自分の開発環境で記事をかけるため、かなり書きやすくなった。一方で、ビルドをするためだけにローカルサーバを立てなければいけないのは結構面倒くさい。</p>
+<p>[追記] Git の post-commit フックを使って、自動的にビルドを走らせるようにしてみた。本当は GitHub Actions を使いたかったが、ビルド用のサーバを立てて、Puppeteer を起動して...とするのは厄介そうだったので妥協策ではある。post-commit フックは <a href="https://github.com/comame/blog.comame.xyz/blob/194b480ee2beec8a75c7638ab7453078faa7aa3f/post-commit" target="_blank">post-commit</a> に置いておく。</p>
+<p>[追記] <a href="https://github.com/comame/blog.comame.xyz/tree/master/.github/workflows/build.yml" target="_blank">GitHub Actions</a> で push したときにビルドが走るようにした。</p>
+
+<h2>今後やりたいこと</h2>
+<ul>
+    <li>Markdown で記事を書けるようにする</li>
+    <li>WebP などの画像フォーマットに自動的に変換できるようにする</li>
+    <li>OGP に対応</li>
+    <li>[DONE] RSS フィードを生成できるようにする</li>
+</ul>

@@ -1,0 +1,15 @@
+<p>8.8.8.8 で知られる Google Public DNS が <a href="https://developers.google.com/speed/public-dns/docs/dns-over-tls" rel="noopener" target="_blank">DNS-over-TLS</a> に対応したようです。既に Cloudflare の提供する 1.1.1.1 は対応済みなので、耳にしたことはあるかもしれません。<br>
+    DNS への問い合わせを TLS で暗号化することで、応答の改ざんを防ぐことができます。</p>
+
+    <p>Android 9 Pie 以降を搭載している Android スマートフォンであれば、簡単に設定ができます。Windows や Mac OS 等では、OS 標準では DNS-over-TLS がサポートされないようです。</p>
+
+    <p>参照: <a href="https://developers.google.com/speed/public-dns/docs/using" target=_blank" rel="noopener">Get Started | Google Public DNS</a></p>
+
+
+    <h2>設定方法</h2>
+
+    <p>「設定」アプリを開き、「ネットワークとインターネット」>「詳細設定」>「プライベート DNS」と進みます。<br>
+    「プライベート DNS プロバイダのホスト名」に <code>dns.google</code> と入力します。
+    ブラウザを開き、Web サイトに正常にアクセスできたら完了です。</p>
+
+    <p>大事なことを書き忘れた: これは Pixel 3 での操作方法です。端末によって操作が異なるかもしれません。</p>

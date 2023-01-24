@@ -1,0 +1,16 @@
+<p>今更感は否めないが、備忘録も兼ねて</p>
+
+<h2>手順</h2>
+
+<ol>
+<li><code>https://get.docker.com/rootless</code>からシェルスクリプトをダウンロードする</li>
+<li>実行する</li>
+<li><code>$HOME/bin/dockerd-rootless.sh --experimental --storage-driver vfs</code>を実行する
+</ol>
+
+<h2>補足</h2>
+
+<p>インストールスクリプトを覗いてみたところ、どうやら自動的に Service を作成してくれるらしい。</p>
+
+<h2>ドキュメント</h2>
+<p><a href='https://github.com/moby/moby/blob/master/docs/rootless.md'>https://github.com/moby/moby/blob/master/docs/rootless.md</a></p>

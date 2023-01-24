@@ -1,0 +1,8 @@
+<p>
+    comame.xyz を Google Compute Engine から Firebase Hosting に戻しました。やはり、自動ですべてを管理してくれるのは便利なものですね。<br>
+    Cloud Functions と接続できるので、今まで Node.js で処理していたものも簡単に移植できました。Cloud Functions も Express ベースなので、コードはほとんどそのままでした。<br>
+    <br>
+    ただし、HTTP ヘッダを自由に書き換えられないのは盲点でした。firebase.json で書き換えることはできるようなのですが、HSTS Preload だけは諦めるしかなさそうです。標準で HSTS は設定されているので、それで妥協することにします。
+    <br>
+    自分で Linux サーバを動かすのはとても勉強になりますが、静的なファイルを配信するだけであれば、既存のサービスを使ってしまうのがどうしても楽ですね。
+</p>

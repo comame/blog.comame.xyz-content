@@ -1,0 +1,35 @@
+<p>現在、macOS 10.14 Mojave において、Safari のブックマークを Chrome にインポートできない問題が発生しているようです。</p>
+<h2>
+問題が発生しうる環境</h2>
+<p>macOS 10.14 Mojave がインストールされたすべてのコンピュータ</p>
+<h2>
+現象の回避方法</h2>
+<p>HTML でブックマークを書き出し、Chrome にインポートする。</p>
+<ol>
+<li>Safari を開き、「ファイル」&gt;「ブックマークの書き出し」を実行してください。</li>
+<li>Chrome の設定画面を開いてください。</li>
+<li>「ブックマークと設定のインポート」を開き、インポート先を「HTML ファイルをブックマークに登録」に指定してください。</li>
+<li>「ファイルを選択」ボタンを押し、手順  1 でエクスポートしたファイルを選択してください。</li>
+</ol>
+<div>
+<h2>
+原因</h2>
+</div>
+<div>
+macOS のセキュリティ機能が原因のようです。</div>
+<div>
+現在 Chrome は Safari のブックマークが保存してあるデータベースを直に読み出すようになっています。しかし、Mojave では Safari の閲覧履歴や Cookie を含む機密データを他のアプリケーションが読み取れないような変更が加えられたため、正常にブックマークをインポートできない問題が発生しています。</div>
+<div>
+<h2>
+現在の対応状況</h2>
+</div>
+<div>
+Apple からの情報待ちのようです。</div>
+<div>
+<h2>
+参照</h2>
+</div>
+<div>
+Issue 850225: Mojave: Review importers from other browsers</div>
+<div>
+<a href="https://bugs.chromium.org/p/chromium/issues/detail?id=850225" rel="noopener" target="_blank">https://bugs.chromium.org/p/chromium/issues/detail?id=850225</a></div>

@@ -1,0 +1,54 @@
+<p>今日このブログで AdSense の申請をしましたが、いくつか技術的な問題があったため、それの対処法を紹介します。</p>
+
+<h2>発生した問題</h2>
+<p>AdSense の申請をするには当然対象の URL が必要ですが、サブドメインでは申請できないという問題があります。このブログは blog.comame.xyz で配信していましたが、comame.xyz に付け替える必要がありました。<br>
+一方、comame.xyz はすでに自前のサーバに割り当てていました。このブログで使用している一部の画像やスクリプトなども comame.xyz から取得していました。そのため、DNS を書き換えるだけではブログのレイアウトが崩れてしまいます。</p>
+
+<h2>状況</h2>
+<p>comame.xyz 上では、すでにいくつかのサービスが動いています。一方で、過去に Docker を使用することで複数のサーバに分割させており、Nginx のリバースプロキシを使ってリクエストを振り分けていました。実際の Nginx のコンフィグの一部は以下のようになっていました。<p>
+<pre><code>
+server {
+  location / {
+    location / {
+       # Docker Compose のサービスの1つとしてホームページを配信していた
+       proxy_pass http://home/;
+    }
+    location /assets {
+      # 画像や CSS、JavaScript はここから配信していた
+      proxy_pass http://assets/;
+    }
+  }
+}
+</code></pre>
+<p>この設定ファイルからわかるように、アセット配信サーバとホームページ配信サーバは別のコンテナで実行していました。</p>
+
+
+<h2>解決策</h2>
+<p>ルートディレクトリだけを blog.comame.xyz へのリバースプロキシとすることで解決しました。アセット配信サーバは変わらず /assets で配信しています。</p>
+<pre><code>
+server {
+    location / {
+        location / {
+            # 今まではコンテナに向けていたものを、blog.comame.xyz に差し替え
+            proxy_pass: https://blog.comame.xyz/;
+
+            # TLS 周りのエラーが発生したので
+            proxy_ssl_server_name on;
+        }
+        location /assets {
+            # 変更なし
+            proxy_pass: http://assets/;
+        }
+    }
+}
+</code></pre>
+
+<h2>現状</h2>
+<p>DNS をいじったわけではないので、blog.comame.xyz にアクセスすることでもブログにアクセスできます。comame.xyz にアクセスすると、今まで表示されていたホームページではなく、ブログが表示されるようになっています。<br>
+次のような流れになっています。<br>
+<code>User Agent -> comame.xyz -(Nginx が代理アクセス)-> blog.comame.xyz</code>
+</p>
+
+<h2>教訓</h2>
+<p>止めると影響が大きいサーバとそうでもないサーバは、分けておいたほうが後々役に立つ (適当)<br>
+AdSense の申請通るといいな</p>

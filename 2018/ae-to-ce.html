@@ -1,0 +1,52 @@
+<p>今まで Google App Engine Node.js Standard Environment (GAE/Node.js SE) で動かしていた <a href="https://comame.xyz/" target="_blank" rel="noopener">comame.xyz</a> を、Compute Engine に移しました。</p><h2>理由</h2><p>Nginx をいじってたら楽しくなってきちゃったから。</p><h2>感想</h2><ul>    <li>予想を遥かに上回るレベルで楽だった</li>
+    <li>環境依存するコードをほぼ書かなくて済むので、GAE/Node.js SE はいいぞ</li>
+    <li>Nginx 楽しい</li>
+    <li>Certbot (Let's Encrypt) すごい楽</li>
+</ul><h2>環境</h2><ul>    <li>Google Compute Engine / f1-micro</li>
+    <li>Ubuntu 18.04</li>
+    <li>Nginx, Node.js</li>
+</ul><h2>手順</h2><ol>    <li>GAE で動いていたコードを、Compute Engine に移す。</li>
+    <li>Nginx の設定ファイルにバーチャルホストの設定を追加する。</li>
+    <li>Node.js を systemd のサービスとして設定する。</li>
+    <li>Nginx の設定ファイルに Node.js へリクエスト回す処理を追記する。</li>
+    <li>Certbot で電子証明書を取得する。</li>
+</ol><h3>コードを移す</h3><p>GAE/Node.js SE は GAE に依存する部分が少ないため、ほぼそのままコードを移すだけで完了。静的なファイルを配信する部分だけ、Nginx 側に処理を回すためにコードを削除。</p><h3>Nginx の設定をする</h3><p>こんな感じ。80 版ポートの方は省略。</p><pre><code># /etc/nginx/sites-enabled/comame.xyz
+
+server {
+    server_name comame.xyz;
+    listen 443 http2 ssl;
+
+    # ....
+}
+</code></pre><h3>systemd に Node.js をサービスとして登録する</h3><p>多分落ちたときに自動再起動してくれると思う。まだ落ちてないからわからん。</p><pre><code># /etc/systemd/system/nodejs.service
+
+[Unit]
+Description=Node.js server
+
+[Service]
+WorkingDirectory=/home/hoge
+Type=simple
+ExecStart=/usr/bin/node /path/to/script.js
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=node
+User=hoge
+Group=hoge
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<p><code>$ systemctl start nodejs.service</code> でサービスを起動。<code>$ systemctl enable nodejs.service</code> で OS の起動時にサービスを起動するよう設定。</p>
+<h3>Nginx から Node.js にリクエストを回す</h3><pre><code># /etc/nginx/sites-enabled/comame.xyz
+
+upstream node {
+    # Node.js は 3000 番ポートで動かすことにした
+    server 127.0.0.1:3000;
+}
+
+server {
+    # ...
+    location / {
+        proxy_pass http://node;
+    }
+}</code></pre><h3>Certbot で電子証明書を取得</h3><p>コマンド叩くだけで電子証明書が取得できるの、本当にすごいよね。あとは Nginx 側で証明書のパスを指定するだけ。</p><p><code>$ certbot certonly --nginx<code></code></code></p>

@@ -1,0 +1,25 @@
+<p>開発鯖用に毎回 Let's Encrypt で発行するのめんどいので、自分で発行しようと思った</p>
+
+<h2>通常の証明書</h2>
+
+<p>
+<pre><code>$ openssl genrsa -aes256 2048 > server.key
+$ openssl req -new -key server.key > server.csr  # Certificate Signing Request
+$ openssl x509 -req -days 90 signkey server.key < server.csr > server.crt</code></pre>
+</p>
+
+<h2>複数の Common Name に対応する</h2>
+<p>
+<pre><code>$ cat > altNames.txt
+subjectAltName = DNS:foo.example.com, DNS:bar.example.com
+
+$ openssl x509 -req -days 90 -signkey server.key -extfile altNames.txt < server.csr > server.crt
+</code></pre>
+
+</p>
+
+<h2>CSR を確認する</h2>
+<pre><code>$ openssl req -in server.csr -noout -text</code></pre>
+
+<h2>証明書の内容 (あるいは期限のみ) を確認する</h2>
+<pre><code>$ openssl x509 -in server.crt -noout -text [-dates]</code></pre>

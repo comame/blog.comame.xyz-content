@@ -1,0 +1,78 @@
+<p>この記事は、<a href="https://twitter.com/androiddev" rel="noopener" target="_blank">@AndroidDev</a> による <a href="https://medium.com/google-developers/31daysofkotlin-week-1-recap-fbd5a622ef86" target="_blank" rel="noopener">#31DaysOfKotlin — Week 1 Recap</a> を<strong>勝手に</strong>日本語訳したものです。
+    基本的な文法からちょっとした TIPS まで様々なことが紹介されているので、知らないものがあったらぜひ使ってみてください。</p><h2>Day 1: Elvis Operator (エルビス演算子)</h2><p>Null チェックをよりスマートにするには、エルビス演算子を使ってみましょう。
+    Null を別の値に置き換えたり、あるいは<code>return</code>したりもできます！
+    Docs: <a href="https://kotlinlang.org/docs/reference/null-safety.html#elvis-operator" target="_blank" rel="noopener">Elvis Operator</a></p><pre><code>val name: String = person.name ?: “unknown”
+    val age = person.age ?: return</code></pre><h2><a class="name" name="day2"></a>Day 2: String Templates (文字列テンプレート)</h2><p>文字列に変数を埋め込むには、変数名の前に<code>$</code>を入れましょう。
+    式を入れるには<code>${expression}</code>のようにしてください。
+    Docs: <a href="https://kotlinlang.org/docs/reference/basic-types.html#string-templates" target="_blank" rel="noopener">String Templates</a></p><pre><code>val language = “Kotlin”
+
+    // “Kotlin has 6 characters”
+    val text = “$language has ${language.length} characters”</code></pre><h2>Day 3: Destructing Declarations (分解宣言)</h2><p><a href="https://github.com/android/kotlin-extensions" target="_blank" rel="noopener">Android KTX</a> では、色の成分値を割り当てるのに分解宣言を使用します。
+    自作のクラス内で分割代入を使用できますし、既存のクラスを拡張して追加することも可能です。(<a href="http://sys1yagi.hatenablog.com/entry/2016/06/05/171132" target="_blank" rel="noopener">日本語名称について参考にした記事</a>)
+    Docs: <a href="https://kotlinlang.org/docs/reference/multi-declarations.html" target="_blank" rel="noopener">Destructing Declarations</a></p><pre><code>// 色要素
+    val (red, green, blue) = color
+
+    // 四角形
+    val (left, top, right, bottom) = rect
+
+    // 座標
+    val (x, y) = point</code></pre><h2><a class="name" name="day4"></a>Day 4: When Expression (When 式)</h2><p>条件分岐をよりよく書くには<code>when</code>式を使ってみましょう。
+    Kotlin の<code>when</code>式は、文字列リテラルや Enum、Range など何にでも使用できます！任意の関数を呼ぶことも可能です。
+    Docs: <a class="markup--anchor markup--p-anchor" href="https://kotlinlang.org/docs/reference/control-flow.html#when-expression" target="_blank" rel="nofollow noopener" data-href="https://kotlinlang.org/docs/reference/control-flow.html#when-expression">When</a></p><pre><code>class Train(val cargo: Number?) {
+        override fun toString(): String {
+            return when (cargo) {
+                null, 0 -&gt; "empty"
+                1 -&gt; "tiny"
+                in 2..10 -&gt; "small"
+                is Int -&gt; "big inty"
+                else -&gt; "$cargo"
+            }
+        }
+    }</code></pre><h2>Day 5: For loops, range expressions and destructing (For ループと Range、分解宣言)</h2><p><code>for</code>ループは Kotlin の Range や分解宣言を使うと便利です。
+    Docs: <a class="markup--anchor markup--p-anchor" href="https://kotlinlang.org/docs/reference/ranges.html" target="_blank" rel="nofollow noopener" data-href="https://kotlinlang.org/docs/reference/ranges.html">Ranges</a>, <a class="markup--anchor markup--p-anchor" href="https://kotlinlang.org/docs/reference/multi-declarations.html#destructuring-declarations" target="_blank" rel="nofollow noopener" data-href="https://kotlinlang.org/docs/reference/multi-declarations.html#destructuring-declarations">Destructuring</a></p><pre><code>// 1 から 100　まで
+    for(i in 1..100) {…}
+
+    // 1 から 100 まで降順
+    for(i in 100 downTo 1){…}
+
+    // 配列の要素を1つ飛ばしで
+    val array = arrayOf(“a”, “b”, “x”)
+    for(i in 1 until array.size step 2 ){…}
+
+    // 配列の要素を分解宣言で取り出す
+    for((index, element) in array.withIndex()) {…}
+
+    // Map の要素を分解宣言で取り出す
+    val map = mapOf(1 to “one”, 2 to “two”)
+    for( (key, value) in map){…}</code></pre><h2><a class="name" name="day6"></a>Day 6: Properties (プロパティ)</h2><p>Kotlin では、クラスのプロパティのゲッターとセッターが自動生成されます。必要に応じてカスタマイズすることも可能です。
+    Docs: <a class="markup--anchor markup--p-anchor" href="https://kotlinlang.org/docs/reference/properties.html" target="_blank" rel="nofollow noopener" data-href="https://kotlinlang.org/docs/reference/properties.html">Properties</a></p><pre><code>class User {
+        // properties
+        val id: String = “” // 変更禁止。ゲッターのみ
+
+        var name: String = “” // デフォルトのゲッターとセッター
+
+        var surname: String = “” // カスタムゲッターとデフォルトのセッター
+          get() = surname.toUpperCase() // custom getter declaration
+
+        var email: String = “” // デフォルトのゲッターとカスタムセッター
+          set(value) { // カスタムセッターの宣言
+              // “value” = セッターのパラメータ
+              // “field” = 自動生成されるバッキングフィールド
+              if(isEmailValid(value)) field = value
+          }
+    }</code></pre><h2>Day 7: Data Classes and equality (データクラスと等価性)</h2><p>データの保持だけが目的であれば、データクラスを使ってみましょう。構造的等価性 (Structual Equality) をチェックする<code>equals()</code>や<code>hashCode()</code>,<code>toString()</code>,<code>copy()</code>などの関数が自動生成されます。
+    Docs: <a class="markup--anchor markup--p-anchor" href="https://kotlinlang.org/docs/reference/data-classes.html#data-classes" target="_blank" rel="nofollow noopener" data-href="https://kotlinlang.org/docs/reference/data-classes.html#data-classes">Data Classes</a>, <a class="markup--anchor markup--p-anchor" href="https://kotlinlang.org/docs/reference/equality.html" target="_blank" rel="nofollow noopener" data-href="https://kotlinlang.org/docs/reference/equality.html">Equality</a></p><pre><code>data class User(
+        val name: String,
+        val email: String,
+        val address: Address,
+        …
+    )
+    public class UserListDiffCallback: DiffUtil.Callback() {
+        override fun areContentsTheSame(
+             oldItemPosition: Int,
+             newItemPosition: Int
+        ): Boolean {
+        // 自動生成された比較メソッドを使用
+        return newUserList[newItemPosition] ==
+               oldUserList[oldItemPosition])
+    }</code></pre>
